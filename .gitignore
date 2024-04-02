@@ -1,7 +1,4 @@
 *.o
 *.d
-/compiled-firmware
-link-overlay.S
-sram-overlay
-sram-overlay.bin
-
+build/
+.cache/

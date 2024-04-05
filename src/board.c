@@ -16,7 +16,6 @@
  */
 
 #include <string.h>
-#include "app/dtmf.h"
 #if defined(ENABLE_FMRADIO)
 #include "app/fm.h"
 #endif
@@ -36,10 +35,7 @@
 #include "driver/gpio.h"
 #include "driver/system.h"
 #include "driver/st7565.h"
-#include "frequencies.h"
-#include "helper/battery.h"
 #include "misc.h"
-#include "settings.h"
 #if defined(ENABLE_OVERLAY)
 #include "sram-overlay.h"
 #endif
@@ -506,7 +502,7 @@ void BOARD_Init(void)
 #endif
 }
 
-void BOARD_EEPROM_Init(void)
+/*void BOARD_EEPROM_Init(void)
 {
 	uint8_t Data[16];
 	uint8_t i;
@@ -604,8 +600,8 @@ void BOARD_EEPROM_Init(void)
 	// 0ED0..0ED7
 	EEPROM_ReadBuffer(0x0ED0, Data, 8);
 	gEeprom.DTMF_SIDE_TONE               = (Data[0] <   2) ? Data[0] : true;
-	gEeprom.DTMF_SEPARATE_CODE           = DTMF_ValidateCodes((char *)(Data + 1), 1) ? Data[1] : '*';
-	gEeprom.DTMF_GROUP_CALL_CODE         = DTMF_ValidateCodes((char *)(Data + 2), 1) ? Data[2] : '#';
+	//gEeprom.DTMF_SEPARATE_CODE           = DTMF_ValidateCodes((char *)(Data + 1), 1) ? Data[1] : '*';
+	//gEeprom.DTMF_GROUP_CALL_CODE         = DTMF_ValidateCodes((char *)(Data + 2), 1) ? Data[2] : '#';
 	gEeprom.DTMF_DECODE_RESPONSE         = (Data[3] <   4) ? Data[3] : 0;
 	gEeprom.DTMF_AUTO_RESET_TIME         = (Data[4] <  61) ? Data[4] : 5;
 	gEeprom.DTMF_PRELOAD_TIME            = (Data[5] < 101) ? Data[5] * 10 : 300;
@@ -620,44 +616,44 @@ void BOARD_EEPROM_Init(void)
 
 	// 0EE0..0EE7
 	EEPROM_ReadBuffer(0x0EE0, Data, 8);
-	if (DTMF_ValidateCodes((char *)Data, 8)) {
-		memcpy(gEeprom.ANI_DTMF_ID, Data, 8);
-	} else {
+	//if (DTMF_ValidateCodes((char *)Data, 8)) {
+	//	memcpy(gEeprom.ANI_DTMF_ID, Data, 8);
+	//} else {
 		// Original firmware overflows into the next string
 		memcpy(gEeprom.ANI_DTMF_ID, "123\0\0\0\0", 8);
-	}
+	//}
 
 	// 0EE8..0EEF
 	EEPROM_ReadBuffer(0x0EE8, Data, 8);
-	if (DTMF_ValidateCodes((char *)Data, 8)) {
-		memcpy(gEeprom.KILL_CODE, Data, 8);
-	} else {
+	//if (DTMF_ValidateCodes((char *)Data, 8)) {
+	//	memcpy(gEeprom.KILL_CODE, Data, 8);
+	//} else {
 		memcpy(gEeprom.KILL_CODE, "ABCD9\0\0", 8);
-	}
+	//}
 
 	// 0EF0..0EF7
 	EEPROM_ReadBuffer(0x0EF0, Data, 8);
-	if (DTMF_ValidateCodes((char *)Data, 8)) {
-		memcpy(gEeprom.REVIVE_CODE, Data, 8);
-	} else {
+	//if (DTMF_ValidateCodes((char *)Data, 8)) {
+	//		memcpy(gEeprom.REVIVE_CODE, Data, 8);
+	//} else {
 		memcpy(gEeprom.REVIVE_CODE, "9DCBA\0\0", 8);
-	}
+	//}
 
 	// 0EF8..0F07
 	EEPROM_ReadBuffer(0x0EF8, Data, 16);
-	if (DTMF_ValidateCodes((char *)Data, 16)) {
-		memcpy(gEeprom.DTMF_UP_CODE, Data, 16);
-	} else {
+	//if (DTMF_ValidateCodes((char *)Data, 16)) {
+	//	memcpy(gEeprom.DTMF_UP_CODE, Data, 16);
+	//} else {
 		memcpy(gEeprom.DTMF_UP_CODE, "12345\0\0\0\0\0\0\0\0\0\0", 16);
-	}
+	//}
 
 	// 0F08..0F17
 	EEPROM_ReadBuffer(0x0F08, Data, 16);
-	if (DTMF_ValidateCodes((char *)Data, 16)) {
-		memcpy(gEeprom.DTMF_DOWN_CODE, Data, 16);
-	} else {
+	//if (DTMF_ValidateCodes((char *)Data, 16)) {
+	//	memcpy(gEeprom.DTMF_DOWN_CODE, Data, 16);
+	//} else {
 		memcpy(gEeprom.DTMF_DOWN_CODE, "54321\0\0\0\0\0\0\0\0\0\0", 16);
-	}
+	//}
 
 	// 0F18..0F1F
 	EEPROM_ReadBuffer(0x0F18, Data, 8);
@@ -704,9 +700,10 @@ void BOARD_EEPROM_Init(void)
 	}
 
 	bHasCustomAesKey = false;
-}
+}*/
 
-void BOARD_EEPROM_LoadCalibration(void)
+// FIXME: probably important lol
+/*void BOARD_EEPROM_LoadCalibration(void)
 {
 	uint8_t Mic;
 
@@ -750,9 +747,9 @@ void BOARD_EEPROM_LoadCalibration(void)
 	gEeprom.DAC_GAIN    = (Misc.DAC_GAIN    < 16) ? Misc.DAC_GAIN : 8;
 
 	BK4819_WriteRegister(BK4819_REG_3B, gEeprom.BK4819_XTAL_FREQ_LOW + 22656);
-}
+}*/
 
-void BOARD_FactoryReset(bool bIsAll)
+/*void BOARD_FactoryReset(bool bIsAll)
 {
 	uint8_t Template[8];
 	uint16_t i;
@@ -775,5 +772,4 @@ void BOARD_FactoryReset(bool bIsAll)
 			EEPROM_WriteBuffer(i, Template);
 		}
 	}
-}
-
+}*/

@@ -31,9 +31,7 @@
 #include "driver/eeprom.h"
 #include "driver/gpio.h"
 #include "driver/uart.h"
-#include "functions.h"
 #include "misc.h"
-#include "settings.h"
 #if defined(ENABLE_OVERLAY)
 #include "sram-overlay.h"
 #endif
@@ -385,9 +383,9 @@ static void CMD_052F(const uint8_t *pBuffer)
 #if defined(ENABLE_NOAA)
 	gIsNoaaMode = false;
 #endif
-	if (gCurrentFunction == FUNCTION_POWER_SAVE) {
+	/*if (gCurrentFunction == FUNCTION_POWER_SAVE) {
 		FUNCTION_Select(FUNCTION_FOREGROUND);
-	}
+	}*/
 	Timestamp = pCmd->Timestamp;
 	GPIO_ClearBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
 

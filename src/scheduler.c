@@ -14,15 +14,7 @@
  *     limitations under the License.
  */
 
-#if defined(ENABLE_FMRADIO)
-#include "app/fm.h"
-#endif
-#include "app/scanner.h"
-#include "audio.h"
-#include "functions.h"
-#include "helper/battery.h"
 #include "misc.h"
-#include "settings.h"
 
 #define DECREMENT_AND_TRIGGER(cnt, flag) \
 	do { \
@@ -35,8 +27,6 @@
 
 static volatile uint32_t gGlobalSysTickCounter;
 
-void SystickHandler(void);
-
 void SystickHandler(void)
 {
 	gGlobalSysTickCounter++;
@@ -45,62 +35,4 @@ void SystickHandler(void)
 		gNextTimeslice500ms = true;
 		DECREMENT_AND_TRIGGER(gTxTimerCountdown, gTxTimeoutReached);
 	}
-	if ((gGlobalSysTickCounter & 3) == 0) {
-		gNextTimeslice40ms = true;
-	}
-	if (gSystickCountdown2) {
-		gSystickCountdown2--;
-	}
-	if (gFoundCDCSSCountdown) {
-		gFoundCDCSSCountdown--;
-	}
-	if (gFoundCTCSSCountdown) {
-		gFoundCTCSSCountdown--;
-	}
-	if (gCurrentFunction == FUNCTION_FOREGROUND) {
-		DECREMENT_AND_TRIGGER(gBatterySaveCountdown, gSchedulePowerSave);
-	}
-	if (gCurrentFunction == FUNCTION_POWER_SAVE) {
-		DECREMENT_AND_TRIGGER(gBatterySave, gBatterySaveCountdownExpired);
-	}
-
-	if (gScanState == SCAN_OFF && gCssScanMode == CSS_SCAN_MODE_OFF && gEeprom.DUAL_WATCH != DUAL_WATCH_OFF) {
-		if (gCurrentFunction != FUNCTION_MONITOR && gCurrentFunction != FUNCTION_TRANSMIT) {
-			if (gCurrentFunction != FUNCTION_RECEIVE) {
-				DECREMENT_AND_TRIGGER(gDualWatchCountdown, gScheduleDualWatch);
-			}
-		}
-	}
-
-#if defined(ENABLE_NOAA)
-	if (gScanState == SCAN_OFF && gCssScanMode == CSS_SCAN_MODE_OFF && gEeprom.DUAL_WATCH == DUAL_WATCH_OFF) {
-		if (gIsNoaaMode && gCurrentFunction != FUNCTION_MONITOR && gCurrentFunction != FUNCTION_TRANSMIT) {
-			if (gCurrentFunction != FUNCTION_RECEIVE) {
-				DECREMENT_AND_TRIGGER(gNOAA_Countdown, gScheduleNOAA);
-			}
-		}
-	}
-#endif
-
-	if (gScanState != SCAN_OFF || gCssScanMode == CSS_SCAN_MODE_SCANNING) {
-		if (gCurrentFunction != FUNCTION_MONITOR && gCurrentFunction != FUNCTION_TRANSMIT) {
-			DECREMENT_AND_TRIGGER(ScanPauseDelayIn10msec, gScheduleScanListen);
-		}
-	}
-
-	DECREMENT_AND_TRIGGER(gTailNoteEliminationCountdown, gFlagTteComplete);
-
-	DECREMENT_AND_TRIGGER(gCountdownToPlayNextVoice, gFlagPlayQueuedVoice);
-
-#if defined(ENABLE_FMRADIO)
-	if (gFM_ScanState != FM_SCAN_OFF && gCurrentFunction != FUNCTION_MONITOR) {
-		if (gCurrentFunction != FUNCTION_TRANSMIT && gCurrentFunction != FUNCTION_RECEIVE) {
-			DECREMENT_AND_TRIGGER(gFmPlayCountdown, gScheduleFM);
-		}
-	}
-#endif
-	if (gVoxStopCountdown) {
-		gVoxStopCountdown--;
-	}
 }
-

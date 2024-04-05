@@ -18,7 +18,6 @@
 #define FREQUENCIES_H
 
 #include <stdint.h>
-#include "radio.h"
 
 enum FREQUENCY_Band_t {
 	BAND1_50MHz = 0,

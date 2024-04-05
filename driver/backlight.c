@@ -17,15 +17,13 @@
 #include "bsp/dp32g030/gpio.h"
 #include "driver/backlight.h"
 #include "driver/gpio.h"
-#include "settings.h"
-
-uint8_t gBacklightCountdown;
+//uint8_t gBacklightCountdown;
 
 void BACKLIGHT_TurnOn(void)
 {
-	if (gEeprom.BACKLIGHT) {
+	//if (gEeprom.BACKLIGHT) {
 		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
-		gBacklightCountdown = 1 + (gEeprom.BACKLIGHT * 2);
-	}
+	//	gBacklightCountdown = 1 + (gEeprom.BACKLIGHT * 2);
+	//}
 }
 

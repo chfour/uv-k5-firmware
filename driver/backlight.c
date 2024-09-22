@@ -19,8 +19,7 @@
 #include "driver/gpio.h"
 //uint8_t gBacklightCountdown;
 
-void BACKLIGHT_TurnOn(void)
-{
+void BACKLIGHT_TurnOn() {
 	//if (gEeprom.BACKLIGHT) {
 		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
 	//	gBacklightCountdown = 1 + (gEeprom.BACKLIGHT * 2);

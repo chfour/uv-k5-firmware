@@ -66,4 +66,3 @@ void GPIO_FlipBit(volatile uint32_t *pReg, uint8_t Bit);
 void GPIO_SetBit(volatile uint32_t *pReg, uint8_t Bit);
 
 #endif
-

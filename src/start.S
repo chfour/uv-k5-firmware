@@ -19,14 +19,13 @@
 
 	.global Stack
 	.global HandlerReset
-	.global Main
+	.global main
 
-	.global OVERLAY_Install
-	.global BOARD_FLASH_Init
+	.global DATA_Init
 	.global BSS_Init
 
-	.global SystickHandler
-	.weak SystickHandler
+	.global Sched_SystickHandler
+	.weak Sched_SystickHandler
 
 	.section .text.isr
 
@@ -61,7 +60,7 @@ Reserved_34:
 PendSV:
 	.long	HandlerPendSV + 1
 SysTick:
-	.long	SystickHandler + 1
+	.long	Sched_SystickHandler + 1
 WWDT:
 	.long	HandlerWWDT + 1
 IWDT:
@@ -245,9 +244,5 @@ HandlerReset:
 	mov	sp, r0
 	bl	DATA_Init
 	bl	BSS_Init
-#if defined(ENABLE_OVERLAY)
-	bl	BOARD_FLASH_Init
-#endif
-	bl	Main
+	bl	main
 	b 	.
-

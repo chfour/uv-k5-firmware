@@ -20,32 +20,29 @@
 #include "driver/i2c.h"
 #include "driver/systick.h"
 
-void I2C_Start(void)
-{
+void I2C_Start() {
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 }
 
-void I2C_Stop(void)
-{
+void I2C_Stop() {
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 }
 
-uint8_t I2C_Read(bool bFinal)
-{
+uint8_t I2C_Read(bool bFinal) {
 	uint8_t i, Data;
 
 	PORTCON_PORTA_IE |= PORTCON_PORTA_IE_A11_BITS_ENABLE;
@@ -55,44 +52,43 @@ uint8_t I2C_Read(bool bFinal)
 	Data = 0;
 	for (i = 0; i < 8; i++) {
 		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 		GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 		Data <<= 1;
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 		if (GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA)) {
 			Data |= 1U;
 		}
 		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 	}
 
 	PORTCON_PORTA_IE &= ~PORTCON_PORTA_IE_A11_MASK;
 	PORTCON_PORTA_OD |= PORTCON_PORTA_OD_A11_BITS_ENABLE;
 	GPIOA->DIR |= GPIO_DIR_11_BITS_OUTPUT;
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	if (bFinal) {
 		GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
 	} else {
 		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
 	}
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	return Data;
 }
 
-int I2C_Write(uint8_t Data)
-{
+int I2C_Write(uint8_t Data) {
 	uint8_t i;
 	int ret = -1;
 
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	for (i = 0; i < 8; i++) {
 		if ((Data & 0x80) == 0) {
 			GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
@@ -100,20 +96,20 @@ int I2C_Write(uint8_t Data)
 			GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
 		}
 		Data <<= 1;
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 		GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 		GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 	}
 
 	PORTCON_PORTA_IE |= PORTCON_PORTA_IE_A11_BITS_ENABLE;
 	PORTCON_PORTA_OD &= ~PORTCON_PORTA_OD_A11_MASK;
 	GPIOA->DIR &= ~GPIO_DIR_11_MASK;
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	for (i = 0; i < 255; i++) {
 		if (GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_I2C_SDA) == 0) {
@@ -123,7 +119,7 @@ int I2C_Write(uint8_t Data)
 	}
 
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_I2C_SCL);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	PORTCON_PORTA_IE &= ~PORTCON_PORTA_IE_A11_MASK;
 	PORTCON_PORTA_OD |= PORTCON_PORTA_OD_A11_BITS_ENABLE;
 	GPIOA->DIR |= GPIO_DIR_11_BITS_OUTPUT;
@@ -132,8 +128,7 @@ int I2C_Write(uint8_t Data)
 	return ret;
 }
 
-int I2C_ReadBuffer(void *pBuffer, uint8_t Size)
-{
+int I2C_ReadBuffer(void *pBuffer, uint8_t Size) {
 	uint8_t *pData = (uint8_t *)pBuffer;
 	uint8_t i;
 
@@ -143,18 +138,17 @@ int I2C_ReadBuffer(void *pBuffer, uint8_t Size)
 	}
 
 	for (i = 0; i < Size - 1; i++) {
-		SYSTICK_DelayUs(1);
+		Systick_DelayUs(1);
 		pData[i] = I2C_Read(false);
 	}
 
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 	pData[i++] = I2C_Read(true);
 
 	return Size;
 }
 
-int I2C_WriteBuffer(const void *pBuffer, uint8_t Size)
-{
+int I2C_WriteBuffer(const void *pBuffer, uint8_t Size) {
 	const uint8_t *pData = (const uint8_t *)pBuffer;
 	uint8_t i;
 
@@ -166,4 +160,3 @@ int I2C_WriteBuffer(const void *pBuffer, uint8_t Size)
 
 	return 0;
 }
-

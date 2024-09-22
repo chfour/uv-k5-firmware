@@ -17,6 +17,7 @@
 #ifndef DRIVER_SPI_H
 #define DRIVER_SPI_H
 
+#include "bsp/dp32g030/spi.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -35,8 +36,8 @@ typedef struct {
 	uint8_t RXFIFO_OVF;
 } SPI_Config_t;
 
-void SPI0_Init(void);
-void SPI_WaitForUndocumentedTxFifoStatusBit(void);
+void SPI0_Init();
+void SPI_WaitForUndocumentedTxFifoStatusBit();
 
 void SPI_Disable(volatile uint32_t *pCR);
 void SPI_Configure(volatile SPI_Port_t *pPort, SPI_Config_t *pConfig);
@@ -44,4 +45,3 @@ void SPI_ToggleMasterMode(volatile uint32_t *pCr, bool bIsMaster);
 void SPI_Enable(volatile uint32_t *pCR);
 
 #endif
-

@@ -32,4 +32,3 @@ void BK1080_SetFrequency(uint16_t Frequency);
 void BK1080_GetFrequencyDeviation(uint16_t Frequency);
 
 #endif
-

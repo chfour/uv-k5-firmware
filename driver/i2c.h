@@ -25,8 +25,8 @@ enum {
 	I2C_READ = 1U,
 };
 
-void I2C_Start(void);
-void I2C_Stop(void);
+void I2C_Start();
+void I2C_Stop();
 
 uint8_t I2C_Read(bool bFinal);
 int I2C_Write(uint8_t Data);
@@ -35,4 +35,3 @@ int I2C_ReadBuffer(void *pBuffer, uint8_t Size);
 int I2C_WriteBuffer(const void *pBuffer, uint8_t Size);
 
 #endif
-

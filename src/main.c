@@ -39,7 +39,7 @@ void _putchar(char c) {
 #endif
 }
 
-void Main(void) {
+int main() {
 	// Enable clock gating of blocks we need.
 	SYSCON_DEV_CLK_GATE = 0
 		| SYSCON_DEV_CLK_GATE_GPIOA_BITS_ENABLE
@@ -51,8 +51,8 @@ void Main(void) {
 		| SYSCON_DEV_CLK_GATE_CRC_BITS_ENABLE
 		| SYSCON_DEV_CLK_GATE_AES_BITS_ENABLE;
 
-	SYSTICK_Init();
-	BOARD_Init();
+	Systick_Init();
+	Board_Init();
 
 #if defined(ENABLE_UART)
 	UART_Init();
@@ -70,19 +70,8 @@ void Main(void) {
 	BATTERY_GetReadings(false);*/
 
 	
-	BACKLIGHT_TurnOn();
+	//BACKLIGHT_TurnOn();
 	UI_DisplayMain();
-
-	while (1) {
-		//APP_Update();
-		if (gNextTimeslice) {
-			//APP_TimeSlice10ms();
-			gNextTimeslice = false;
-		}
-		if (gNextTimeslice500ms) {
-			//APP_TimeSlice500ms();
-			gNextTimeslice500ms = false;
-		}
-	}
+	
+	while (1) {}
 }
-

@@ -51,7 +51,6 @@ extern KEY_Code_t gKeyReading1;
 extern uint16_t gDebounceCounter;
 extern bool gWasFKeyPressed;
 
-KEY_Code_t KEYBOARD_Poll(void);
+KEY_Code_t KEYBOARD_Poll();
 
 #endif
-

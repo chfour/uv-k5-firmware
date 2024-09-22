@@ -25,8 +25,7 @@ KEY_Code_t gKeyReading1 = KEY_INVALID;
 uint16_t gDebounceCounter;
 bool gWasFKeyPressed;
 
-KEY_Code_t KEYBOARD_Poll(void)
-{
+KEY_Code_t KEYBOARD_Poll() {
 	KEY_Code_t Key = KEY_INVALID;
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
@@ -34,7 +33,7 @@ KEY_Code_t KEYBOARD_Poll(void)
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
 
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	// Keys connected to gnd
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
@@ -49,7 +48,7 @@ KEY_Code_t KEYBOARD_Poll(void)
 
 	// First row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
 		Key = KEY_MENU;
@@ -70,10 +69,10 @@ KEY_Code_t KEYBOARD_Poll(void)
 
 	// Second row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_5);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
 		Key = KEY_UP;
@@ -94,16 +93,16 @@ KEY_Code_t KEYBOARD_Poll(void)
 
 	// Third row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_5);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
 		Key = KEY_DOWN;
@@ -124,10 +123,10 @@ KEY_Code_t KEYBOARD_Poll(void)
 
 	// Fourth row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
-	SYSTICK_DelayUs(1);
+	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
 		Key = KEY_EXIT;
@@ -154,4 +153,3 @@ Bye:
 
 	return Key;
 }
-

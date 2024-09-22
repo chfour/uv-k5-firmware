@@ -21,11 +21,11 @@
 #include <stdint.h>
 
 void BOARD_FLASH_Init(void);
-void BOARD_GPIO_Init(void);
-void BOARD_PORTCON_Init(void);
-void BOARD_ADC_Init(void);
-void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent);
-void BOARD_Init(void);
+void Board_GPIO_Init(void);
+void Board_PORTCON_Init(void);
+void Board_ADC_Init(void);
+void Board_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent);
+void Board_Init(void);
 void BOARD_EEPROM_Init(void);
 void BOARD_EEPROM_LoadCalibration(void);
 void BOARD_FactoryReset(bool bIsAll);

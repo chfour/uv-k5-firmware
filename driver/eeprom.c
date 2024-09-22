@@ -16,7 +16,7 @@
 
 #include "driver/eeprom.h"
 #include "driver/i2c.h"
-#include "driver/system.h"
+#include "driver/systick.h"
 
 void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size)
 {
@@ -50,6 +50,6 @@ void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer)
 
 	I2C_Stop();
 
-	SYSTEM_DelayMs(10);
+	Systick_DelayMs(10);
 }
 

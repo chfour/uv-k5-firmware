@@ -19,8 +19,6 @@
 
 #include <stdint.h>
 
-void SYSTEM_DelayMs(uint32_t Delay);
-void SYSTEM_ConfigureClocks(void);
+void System_ConfigureClocks(void);
 
 #endif
-

@@ -20,14 +20,13 @@
 #include "driver/gpio.h"
 #include "driver/spi.h"
 #include "driver/st7565.h"
-#include "driver/system.h"
+#include "driver/systick.h"
 #include "misc.h"
 
 uint8_t gStatusLine[128];
 uint8_t gFrameBuffer[7][128];
 
-void ST7565_DrawLine(uint8_t Column, uint8_t Line, uint16_t Size, const uint8_t *pBitmap, bool bIsClearMode)
-{
+void ST7565_DrawLine(uint8_t Column, uint8_t Line, uint16_t Size, const uint8_t *pBitmap, bool bIsClearMode) {
 	uint16_t i;
 
 	SPI_ToggleMasterMode(&SPI0->CR, false);
@@ -52,8 +51,7 @@ void ST7565_DrawLine(uint8_t Column, uint8_t Line, uint16_t Size, const uint8_t 
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 }
 
-void ST7565_BlitFullScreen(void)
-{
+void ST7565_BlitFullScreen() {
 	uint8_t Line;
 	uint8_t Column;
 
@@ -71,12 +69,11 @@ void ST7565_BlitFullScreen(void)
 		SPI_WaitForUndocumentedTxFifoStatusBit();
 	}
 
-	SYSTEM_DelayMs(20);
+	Systick_DelayMs(20);
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 }
 
-void ST7565_BlitStatusLine(void)
-{
+void ST7565_BlitStatusLine() {
 	uint8_t i;
 
 	SPI_ToggleMasterMode(&SPI0->CR, false);
@@ -93,8 +90,7 @@ void ST7565_BlitStatusLine(void)
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 }
 
-void ST7565_FillScreen(uint8_t Value)
-{
+void ST7565_FillScreen(uint8_t Value) {
 	uint8_t i, j;
 
 	SPI_ToggleMasterMode(&SPI0->CR, false);
@@ -111,13 +107,12 @@ void ST7565_FillScreen(uint8_t Value)
 	SPI_ToggleMasterMode(&SPI0->CR, true);
 }
 
-void ST7565_Init(void)
-{
+void ST7565_Init() {
 	SPI0_Init();
 	ST7565_HardwareReset();
 	SPI_ToggleMasterMode(&SPI0->CR, false);
 	ST7565_WriteByte(0xE2);
-	SYSTEM_DelayMs(0x78);
+	Systick_DelayMs(0x78);
 	ST7565_WriteByte(0xA2);
 	ST7565_WriteByte(0xC0);
 	ST7565_WriteByte(0xA1);
@@ -127,14 +122,14 @@ void ST7565_Init(void)
 	ST7565_WriteByte(0x81);
 	ST7565_WriteByte(0x1F);
 	ST7565_WriteByte(0x2B);
-	SYSTEM_DelayMs(1);
+	Systick_DelayMs(1);
 	ST7565_WriteByte(0x2E);
-	SYSTEM_DelayMs(1);
+	Systick_DelayMs(1);
 	ST7565_WriteByte(0x2F);
 	ST7565_WriteByte(0x2F);
 	ST7565_WriteByte(0x2F);
 	ST7565_WriteByte(0x2F);
-	SYSTEM_DelayMs(0x28);
+	Systick_DelayMs(0x28);
 	ST7565_WriteByte(0x40);
 	ST7565_WriteByte(0xAF);
 	SPI_WaitForUndocumentedTxFifoStatusBit();
@@ -142,18 +137,16 @@ void ST7565_Init(void)
 	ST7565_FillScreen(0x00);
 }
 
-void ST7565_HardwareReset(void)
-{
+void ST7565_HardwareReset() {
 	GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_RES);
-	SYSTEM_DelayMs(1);
+	Systick_DelayMs(1);
 	GPIO_ClearBit(&GPIOB->DATA, GPIOB_PIN_ST7565_RES);
-	SYSTEM_DelayMs(20);
+	Systick_DelayMs(20);
 	GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_RES);
-	SYSTEM_DelayMs(120);
+	Systick_DelayMs(120);
 }
 
-void ST7565_SelectColumnAndLine(uint8_t Column, uint8_t Line)
-{
+void ST7565_SelectColumnAndLine(uint8_t Column, uint8_t Line) {
 	GPIO_ClearBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
 	while ((SPI0->FIFOST & SPI_FIFOST_TFF_MASK) != SPI_FIFOST_TFF_BITS_NOT_FULL) {
 	}
@@ -167,8 +160,7 @@ void ST7565_SelectColumnAndLine(uint8_t Column, uint8_t Line)
 	SPI_WaitForUndocumentedTxFifoStatusBit();
 }
 
-void ST7565_WriteByte(uint8_t Value)
-{
+void ST7565_WriteByte(uint8_t Value) {
 	GPIO_ClearBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
 	while ((SPI0->FIFOST & SPI_FIFOST_TFF_MASK) != SPI_FIFOST_TFF_BITS_NOT_FULL) {
 	}

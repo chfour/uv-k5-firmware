@@ -18,7 +18,7 @@
 #include "driver/bk1080.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
-#include "driver/system.h"
+#include "driver/systick.h"
 #include "misc.h"
 
 static const uint16_t BK1080_RegisterTable[] = {
@@ -38,8 +38,7 @@ static bool gIsInitBK1080;
 uint16_t BK1080_BaseFrequency;
 uint16_t BK1080_FrequencyDeviation;
 
-void BK1080_Init(uint16_t Frequency, bool bEnable)
-{
+void BK1080_Init(uint16_t Frequency, bool bEnable) {
 	uint8_t i;
 
 	if (bEnable) {
@@ -49,17 +48,17 @@ void BK1080_Init(uint16_t Frequency, bool bEnable)
 			for (i = 0; i < ARRAY_SIZE(BK1080_RegisterTable); i++) {
 				BK1080_WriteRegister(i, BK1080_RegisterTable[i]);
 			}
-			SYSTEM_DelayMs(250);
+			Systick_DelayMs(250);
 			BK1080_WriteRegister(BK1080_REG_25_INTERNAL, 0xA83C);
 			BK1080_WriteRegister(BK1080_REG_25_INTERNAL, 0xA8BC);
-			SYSTEM_DelayMs(60);
+			Systick_DelayMs(60);
 			gIsInitBK1080 = true;
 		} else {
 			BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, 0x0201);
 		}
 		BK1080_WriteRegister(BK1080_REG_05_SYSTEM_CONFIGURATION2, 0x0A5F);
 		BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-		SYSTEM_DelayMs(10);
+		Systick_DelayMs(10);
 		BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
 	} else {
 		BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, 0x0241);
@@ -67,8 +66,7 @@ void BK1080_Init(uint16_t Frequency, bool bEnable)
 	}
 }
 
-uint16_t BK1080_ReadRegister(BK1080_Register_t Register)
-{
+uint16_t BK1080_ReadRegister(BK1080_Register_t Register) {
 	uint8_t Value[2];
 
 	I2C_Start();
@@ -79,8 +77,7 @@ uint16_t BK1080_ReadRegister(BK1080_Register_t Register)
 	return (Value[0] << 8) | Value[1];
 }
 
-void BK1080_WriteRegister(BK1080_Register_t Register, uint16_t Value)
-{
+void BK1080_WriteRegister(BK1080_Register_t Register, uint16_t Value) {
 	I2C_Start();
 	I2C_Write(0x80);
 	I2C_Write((Register << 1) | I2C_WRITE);
@@ -89,8 +86,7 @@ void BK1080_WriteRegister(BK1080_Register_t Register, uint16_t Value)
 	I2C_Stop();
 }
 
-void BK1080_Mute(bool Mute)
-{
+void BK1080_Mute(bool Mute) {
 	if (Mute) {
 		BK1080_WriteRegister(BK1080_REG_02_POWER_CONFIGURATION, 0x4201);
 	} else {
@@ -98,16 +94,13 @@ void BK1080_Mute(bool Mute)
 	}
 }
 
-void BK1080_SetFrequency(uint16_t Frequency)
-{
+void BK1080_SetFrequency(uint16_t Frequency) {
 	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, Frequency - 760);
-	SYSTEM_DelayMs(10);
+	Systick_DelayMs(10);
 	BK1080_WriteRegister(BK1080_REG_03_CHANNEL, (Frequency - 760) | 0x8000);
 }
 
-void BK1080_GetFrequencyDeviation(uint16_t Frequency)
-{
+void BK1080_GetFrequencyDeviation(uint16_t Frequency) {
 	BK1080_BaseFrequency = Frequency;
 	BK1080_FrequencyDeviation = BK1080_ReadRegister(BK1080_REG_07) / 16;
 }
-

@@ -15,6 +15,8 @@
  */
 
 #include "misc.h"
+#include "driver/gpio.h"
+#include "bsp/dp32g030/gpio.h"
 
 #define DECREMENT_AND_TRIGGER(cnt, flag) \
 	do { \
@@ -27,12 +29,11 @@
 
 static volatile uint32_t gGlobalSysTickCounter;
 
-void SystickHandler(void)
-{
+void Sched_SystickHandler() {
 	gGlobalSysTickCounter++;
-	gNextTimeslice = true;
 	if ((gGlobalSysTickCounter % 50) == 0) {
 		gNextTimeslice500ms = true;
-		DECREMENT_AND_TRIGGER(gTxTimerCountdown, gTxTimeoutReached);
+		// blink backlight
+		GPIO_FlipBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
 	}
 }

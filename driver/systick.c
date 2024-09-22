@@ -21,34 +21,35 @@
 // 0x20000324
 static uint32_t gTickMultiplier;
 
-void SYSTICK_Init(void)
-{
+void Systick_Init() {
 	SysTick_Config(480000);
 	gTickMultiplier = 48;
 }
 
-void SYSTICK_DelayUs(uint32_t Delay)
-{
+void Systick_DelayUs(uint32_t delay) {
 	uint32_t i;
-	uint32_t Start;
-	uint32_t Previous;
-	uint32_t Current;
-	uint32_t Delta;
+	uint32_t start;
+	uint32_t previous;
+	uint32_t current;
+	uint32_t delta;
 
 	i = 0;
-	Start = SysTick->LOAD;
-	Previous = SysTick->VAL;
+	start = SysTick->LOAD;
+	previous = SysTick->VAL;
 	do {
 		do {
-			Current = SysTick->VAL;
-		} while (Current == Previous);
-		if (Current < Previous) {
-			Delta = -Current;
+			current = SysTick->VAL;
+		} while (current == previous);
+		if (current < previous) {
+			delta = -current;
 		} else {
-			Delta = Start - Current;
+			delta = start - current;
 		}
-		i += Delta + Previous;
-		Previous = Current;
-	} while (i < Delay * gTickMultiplier);
+		i += delta + previous;
+		previous = current;
+	} while (i < delay * gTickMultiplier);
 }
 
+void Systick_DelayMs(uint32_t delay) {
+	Systick_DelayUs(delay * 1000);
+}

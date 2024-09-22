@@ -36,13 +36,10 @@
 #include "driver/system.h"
 #include "driver/st7565.h"
 #include "misc.h"
-#if defined(ENABLE_OVERLAY)
-#include "sram-overlay.h"
-#endif
+
 
 #if defined(ENABLE_OVERLAY)
-void BOARD_FLASH_Init(void)
-{
+void BOARD_FLASH_Init() {
 	FLASH_Init(FLASH_READ_MODE_1_CYCLE);
 	FLASH_ConfigureTrimValues();
 	SYSTEM_ConfigureClocks();
@@ -52,8 +49,7 @@ void BOARD_FLASH_Init(void)
 }
 #endif
 
-void BOARD_GPIO_Init(void)
-{
+void Board_GPIO_Init() {
 	GPIOA->DIR |= 0
 		// A7 = UART1 TX default as OUTPUT from bootloader!
 		// A8 = UART1 RX default as INPUT from bootloader!
@@ -109,8 +105,7 @@ void BOARD_GPIO_Init(void)
 #endif
 }
 
-void BOARD_PORTCON_Init(void)
-{
+void Board_PORTCON_Init() {
 	// PORT A pin selection
 
 	PORTCON_PORTA_SEL0 &= ~(0
@@ -454,8 +449,7 @@ void BOARD_PORTCON_Init(void)
 		;
 }
 
-void BOARD_ADC_Init(void)
-{
+void Board_ADC_Init() {
 	ADC_Config_t Config;
 
 	Config.CLK_SEL = SYSCON_CLK_SEL_W_SARADC_SMPL_VALUE_DIV2;
@@ -478,8 +472,7 @@ void BOARD_ADC_Init(void)
 	ADC_SoftReset();
 }
 
-void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent)
-{
+void Board_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent) {
 	ADC_Start();
 
 	while (!ADC_CheckEndOfConversion(ADC_CH9)) {
@@ -488,11 +481,10 @@ void BOARD_ADC_GetBatteryInfo(uint16_t *pVoltage, uint16_t *pCurrent)
 	*pCurrent = ADC_GetValue(ADC_CH9);
 }
 
-void BOARD_Init(void)
-{
-	BOARD_PORTCON_Init();
-	BOARD_GPIO_Init();
-	BOARD_ADC_Init();
+void Board_Init() {
+	Board_PORTCON_Init();
+	Board_GPIO_Init();
+	Board_ADC_Init();
 	ST7565_Init();
 #if defined(ENABLE_FMRADIO)
 	BK1080_Init(0, false);
@@ -502,8 +494,7 @@ void BOARD_Init(void)
 #endif
 }
 
-/*void BOARD_EEPROM_Init(void)
-{
+/*void BOARD_EEPROM_Init() {
 	uint8_t Data[16];
 	uint8_t i;
 
@@ -703,8 +694,7 @@ void BOARD_Init(void)
 }*/
 
 // FIXME: probably important lol
-/*void BOARD_EEPROM_LoadCalibration(void)
-{
+/*void BOARD_EEPROM_LoadCalibration() {
 	uint8_t Mic;
 
 	EEPROM_ReadBuffer(0x1EC0, gEEPROM_RSSI_CALIB[3], 8);
@@ -749,8 +739,7 @@ void BOARD_Init(void)
 	BK4819_WriteRegister(BK4819_REG_3B, gEeprom.BK4819_XTAL_FREQ_LOW + 22656);
 }*/
 
-/*void BOARD_FactoryReset(bool bIsAll)
-{
+/*void BOARD_FactoryReset(bool bIsAll) {
 	uint8_t Template[8];
 	uint16_t i;
 

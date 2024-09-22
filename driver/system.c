@@ -19,13 +19,7 @@
 #include "driver/system.h"
 #include "driver/systick.h"
 
-void SYSTEM_DelayMs(uint32_t Delay)
-{
-	SYSTICK_DelayUs(Delay * 1000);
-}
-
-void SYSTEM_ConfigureClocks(void)
-{
+void System_ConfigureClocks() {
 	// Set source clock from external crystal
 	PMU_SRC_CFG = (PMU_SRC_CFG & ~(PMU_SRC_CFG_RCHF_SEL_MASK | PMU_SRC_CFG_RCHF_EN_MASK))
 		| PMU_SRC_CFG_RCHF_SEL_BITS_48MHZ
@@ -37,4 +31,3 @@ void SYSTEM_ConfigureClocks(void)
 	// Disable division clock gate
 	SYSCON_DIV_CLK_GATE = (SYSCON_DIV_CLK_GATE & ~SYSCON_DIV_CLK_GATE_DIV_CLK_GATE_MASK) | SYSCON_DIV_CLK_GATE_DIV_CLK_GATE_BITS_DISABLE;
 }
-

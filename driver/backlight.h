@@ -21,7 +21,7 @@
 
 extern uint8_t gBacklightCountdown;
 
-void BACKLIGHT_TurnOn(void);
+void BACKLIGHT_TurnOn();
 
 #endif
 

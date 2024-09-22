@@ -17,8 +17,7 @@
 #include "bsp/dp32g030/crc.h"
 #include "driver/crc.h"
 
-void CRC_Init(void)
-{
+void CRC_Init(void) {
 	CRC_CR = 0
 		| CRC_CR_CRC_EN_BITS_DISABLE
 		| CRC_CR_INPUT_REV_BITS_NORMAL
@@ -31,8 +30,7 @@ void CRC_Init(void)
 	CRC_IV = 0;
 }
 
-uint16_t CRC_Calculate(const void *pBuffer, uint16_t Size)
-{
+uint16_t CRC_Calculate(const void *pBuffer, uint16_t Size) {
 	const uint8_t *pData = (const uint8_t *)pBuffer;
 	uint16_t i, Crc;
 

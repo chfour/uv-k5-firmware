@@ -27,7 +27,7 @@
           };
           devShells.default = with pkgs; mkShell {
             nativeBuildInputs = [
-              (python312.withPackages (p: with p; [ crcmod ]))
+              (python312.withPackages (p: with p; [ crcmod pillow ]))
               gcc-arm-embedded-10
               meson ninja
               self.packages.${system}.k5prog

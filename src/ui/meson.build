@@ -1,3 +1,6 @@
 sources += files(
-    'main.c'
+    'main.c',
+    'text.c'
 )
+
+subdir('font')

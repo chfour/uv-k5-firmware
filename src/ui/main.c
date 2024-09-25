@@ -14,14 +14,18 @@
  *     limitations under the License.
  */
 
-#include <string.h>
 #include "driver/st7565.h"
-#include "external/printf/printf.h"
 #include "ui/main.h"
+#include "ui/text.h"
+#include <string.h>
+#include <stdint.h>
 
 void UI_DisplayMain(void) {
-	//gFrameBuffer[6][127] = 0xaa;
+	memset(gFrameBuffer[6], 0xAA, 127);
+	for (uint8_t i = 0; i < 128; i++) {
+		gFrameBuffer[6][i] = (i & 2) ? 0x33 : 0xCC; // checkerboard pattern
+	}
+	Text_DrawText(0, 3, "test TEST 123 !\"#~");
 
-	//ST7565_BlitFullScreen();
-	ST7565_FillScreen(0xAA);
+	ST7565_BlitFullScreen();
 }

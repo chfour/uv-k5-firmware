@@ -17,7 +17,7 @@
 #ifndef UI_MAIN_H
 #define UI_MAIN_H
 
-void UI_DisplayMain(void);
+void UI_DisplayMain();
 
 #endif
 

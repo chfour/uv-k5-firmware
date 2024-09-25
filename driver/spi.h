@@ -37,6 +37,8 @@ typedef struct {
 } SPI_Config_t;
 
 void SPI0_Init();
+
+void SPI_WaitForFifo();
 void SPI_WaitForUndocumentedTxFifoStatusBit();
 
 void SPI_Disable(volatile uint32_t *pCR);

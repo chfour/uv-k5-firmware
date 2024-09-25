@@ -33,7 +33,7 @@ void Sched_SystickHandler() {
 	gGlobalSysTickCounter++;
 	if ((gGlobalSysTickCounter % 50) == 0) {
 		gNextTimeslice500ms = true;
-		// blink backlight
-		GPIO_FlipBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
 	}
+	// blink backlight
+	GPIO_FlipBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
 }

@@ -42,6 +42,10 @@ void SPI0_Init() {
 	SPI_Enable(&SPI0->CR);
 }
 
+void SPI_WaitForFifo() {
+	while ((SPI0->FIFOST & SPI_FIFOST_TFF_MASK) != SPI_FIFOST_TFF_BITS_NOT_FULL) {}
+}
+
 void SPI_WaitForUndocumentedTxFifoStatusBit() {
 	uint32_t Timeout;
 

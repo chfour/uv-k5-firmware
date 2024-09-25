@@ -14,18 +14,24 @@
  *     limitations under the License.
  */
 
-#include "driver/st7565.h"
 #include "ui/main.h"
+#include "driver/systick.h"
+#include "ui/fb.h"
 #include "ui/text.h"
-#include <string.h>
 #include <stdint.h>
 
 void UI_DisplayMain(void) {
-	memset(gFrameBuffer[6], 0xAA, 127);
 	for (uint8_t i = 0; i < 128; i++) {
-		gFrameBuffer[6][i] = (i & 2) ? 0x33 : 0xCC; // checkerboard pattern
+		gFramebuffer[6][i] = (i & 2) ? 0x33 : 0xCC; // checkerboard pattern
 	}
-	Text_DrawText(0, 3, "test TEST 123 !\"#~");
+	FB_MARKDIRTY(6);
 
-	ST7565_BlitFullScreen();
+	Text_DrawText(0, 0, "row 0");
+	Text_DrawText(5, 1, "row 1");
+	Text_DrawText(0, 3, "test TEST 123 !\"#~");
+	Text_DrawText(0, 7, "row 7");
+	Framebuffer_UpdateScreen();
+	Systick_DelayMs(2000);
+	Text_DrawText(0, 4, "012345678901234567890"); // 3 pixels of empty space to the right i think
+	Framebuffer_UpdateScreen();
 }

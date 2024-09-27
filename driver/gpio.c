@@ -16,23 +16,19 @@
 
 #include "driver/gpio.h"
 
-void GPIO_ClearBit(volatile uint32_t *pReg, uint8_t Bit)
-{
+void GPIO_ClearBit(volatile uint32_t *pReg, uint8_t Bit) {
 	*pReg &= ~(1U << Bit);
 }
 
-uint8_t GPIO_CheckBit(volatile uint32_t *pReg, uint8_t Bit)
-{
+uint8_t GPIO_CheckBit(volatile uint32_t *pReg, uint8_t Bit) {
 	return (*pReg >> Bit) & 1U;
 }
 
-void GPIO_FlipBit(volatile uint32_t *pReg, uint8_t Bit)
-{
+void GPIO_FlipBit(volatile uint32_t *pReg, uint8_t Bit) {
 	*pReg ^= 1U << Bit;
 }
 
-void GPIO_SetBit(volatile uint32_t *pReg, uint8_t Bit)
-{
+void GPIO_SetBit(volatile uint32_t *pReg, uint8_t Bit) {
 	*pReg |= 1U << Bit;
 }
 

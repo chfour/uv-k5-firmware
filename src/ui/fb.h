@@ -1,5 +1,5 @@
-#ifndef FB_H
-#define FB_H
+#ifndef UI_FB_H
+#define UI_FB_H
 
 #include <stdint.h>
 

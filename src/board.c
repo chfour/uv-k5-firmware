@@ -31,23 +31,11 @@
 #include "driver/bk4819.h"
 #include "driver/crc.h"
 #include "driver/eeprom.h"
-#include "driver/flash.h"
 #include "driver/gpio.h"
 #include "driver/system.h"
 #include "driver/st7565.h"
 #include "misc.h"
 
-
-#if defined(ENABLE_OVERLAY)
-void BOARD_FLASH_Init() {
-	FLASH_Init(FLASH_READ_MODE_1_CYCLE);
-	FLASH_ConfigureTrimValues();
-	SYSTEM_ConfigureClocks();
-	overlay_FLASH_MainClock = 48000000;
-	overlay_FLASH_ClockMultiplier = 48;
-	FLASH_Init(FLASH_READ_MODE_2_CYCLE);
-}
-#endif
 
 void Board_GPIO_Init() {
 	GPIOA->DIR |= 0

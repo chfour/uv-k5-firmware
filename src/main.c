@@ -14,24 +14,20 @@
  *     limitations under the License.
  */
 
-#include <string.h>
-#include "bsp/dp32g030/gpio.h"
+//#include <string.h>
+//#include "bsp/dp32g030/gpio.h"
 #include "bsp/dp32g030/syscon.h"
 #include "board.h"
-#include "driver/backlight.h"
-#include "driver/bk4819.h"
-#include "driver/gpio.h"
-#include "driver/system.h"
+//#include "driver/backlight.h"
+//#include "driver/bk4819.h"
+//#include "driver/gpio.h"
+//#include "driver/system.h"
 #include "driver/systick.h"
-#include "ui/main.h"
+#include "app/main.h"
 #if defined(ENABLE_UART)
 #include "driver/uart.h"
 #endif
-#include "misc.h"
-
-#if defined(ENABLE_UART)
-static const char Version[] = "UV-K5 Firmware, Open Edition, OEFW-"GIT_HASH"\r\n";
-#endif
+//#include "misc.h"
 
 void _putchar(char c) {
 #if defined(ENABLE_UART)
@@ -59,7 +55,7 @@ int main() {
 	UART_Send(Version, sizeof(Version));
 #endif
 
-	BK4819_Init();
+	//BK4819_Init();
 	//BOARD_ADC_GetBatteryInfo(&gBatteryCurrentVoltage, &gBatteryCurrent);
 	//BOARD_EEPROM_Init();
 	//BOARD_EEPROM_LoadCalibration();
@@ -71,7 +67,7 @@ int main() {
 
 	
 	//BACKLIGHT_TurnOn();
-	UI_DisplayMain();
+	App_Main();
 	
 	while (1) {}
 }

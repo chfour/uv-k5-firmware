@@ -23,18 +23,16 @@
 #include "driver/systick.h"
 
 void ST7565_DrawLine(uint8_t x, uint8_t row, const uint8_t *data, uint8_t size) {
-	uint8_t i;
-
 	SPI_ToggleMasterMode(&SPI0->CR, false);
 	ST7565_SelectColumnAndLine(x + 4, row);
-	GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
 
+	ST7565_A0Mode(ST7565_DATA);
 	if (data != 0) { // is NULL
-		for (i = 0; i < size; i++) {
+		for (uint8_t i = 0; i < size; i++) {
 			ST7565_WriteByte(data[i]);
 		}
 	} else {
-		for (i = 0; i < size; i++) {
+		for (uint8_t i = 0; i < size; i++) {
 			ST7565_WriteByte(0);
 		}
 	}
@@ -47,8 +45,9 @@ void ST7565_Init() {
 	SPI0_Init();
 	ST7565_HardwareReset();
 	SPI_ToggleMasterMode(&SPI0->CR, false);
+	ST7565_A0Mode(ST7565_CMD);
 	ST7565_WriteByte(0xE2);
-	Systick_DelayMs(0x78);
+	Systick_DelayMs(120);
 	ST7565_WriteByte(0xA2);
 	ST7565_WriteByte(0xC0);
 	ST7565_WriteByte(0xA1);
@@ -65,7 +64,7 @@ void ST7565_Init() {
 	ST7565_WriteByte(0x2F);
 	ST7565_WriteByte(0x2F);
 	ST7565_WriteByte(0x2F);
-	Systick_DelayMs(0x28);
+	Systick_DelayMs(40);
 	ST7565_WriteByte(0x40);
 	ST7565_WriteByte(0xAF);
 	SPI_WaitForUndocumentedTxFifoStatusBit();
@@ -86,6 +85,7 @@ void ST7565_HardwareReset() {
 }
 
 void ST7565_SelectColumnAndLine(uint8_t x, uint8_t row) {
+	ST7565_A0Mode(ST7565_CMD);
 	ST7565_WriteByte(row + 0xB0);
 	ST7565_WriteByte(((x >> 4) & 0x0F) | 0x10);
 	ST7565_WriteByte(((x >> 0) & 0x0F));
@@ -93,7 +93,14 @@ void ST7565_SelectColumnAndLine(uint8_t x, uint8_t row) {
 }
 
 void ST7565_WriteByte(uint8_t v) {
-	GPIO_ClearBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
 	while ((SPI0->FIFOST & SPI_FIFOST_TFF_MASK) != SPI_FIFOST_TFF_BITS_NOT_FULL) {}
 	SPI0->WDR = v;
+}
+
+void ST7565_A0Mode(uint8_t mode) {
+	if (mode) { // ST7565_DATA
+		GPIO_SetBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
+	} else { // ST7565_CMD
+		GPIO_ClearBit(&GPIOB->DATA, GPIOB_PIN_ST7565_A0);
+	}
 }

@@ -38,7 +38,7 @@ enum KEY_Code_t {
 	KEY_EXIT = 13,
 	KEY_STAR = 14,
 	KEY_F = 15,
-	KEY_PTT = 21,
+	// KEY_PTT = 21,
 	KEY_SIDE2 = 22,
 	KEY_SIDE1 = 23,
 	KEY_INVALID = 255,
@@ -51,6 +51,13 @@ extern KEY_Code_t gKeyReading1;
 extern uint16_t gDebounceCounter;
 extern bool gWasFKeyPressed;
 
-KEY_Code_t KEYBOARD_Poll();
+// check if the ptt button is pressed
+uint8_t Keyboard_CheckPTT();
+
+// poll the keypad
+KEY_Code_t Keyboard_Poll();
+
+// convert a keycode to a char
+char Keyboard_ToChar(KEY_Code_t keycode);
 
 #endif

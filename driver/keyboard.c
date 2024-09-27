@@ -25,7 +25,11 @@ KEY_Code_t gKeyReading1 = KEY_INVALID;
 uint16_t gDebounceCounter;
 bool gWasFKeyPressed;
 
-KEY_Code_t KEYBOARD_Poll() {
+uint8_t Keyboard_CheckPTT() {
+	return !GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT);
+}
+
+KEY_Code_t Keyboard_Poll() {
 	KEY_Code_t Key = KEY_INVALID;
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
@@ -152,4 +156,24 @@ Bye:
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
 
 	return Key;
+}
+
+char Keyboard_ToChar(KEY_Code_t keycode) {
+	switch (keycode) {
+		case KEY_0: case KEY_1:
+		case KEY_2: case KEY_3:
+		case KEY_4: case KEY_5:
+		case KEY_6: case KEY_7:
+		case KEY_8: case KEY_9:
+			return '0' + keycode;
+		case KEY_MENU: case KEY_UP:
+		case KEY_DOWN: case KEY_EXIT:
+			return 'A' + keycode - KEY_MENU;
+		case KEY_STAR:  return '*'; break;
+		case KEY_F:     return 'F'; break;
+		case KEY_SIDE1: return '-'; break;
+		case KEY_SIDE2: return '='; break;
+		default:
+			return '.';
+	}
 }

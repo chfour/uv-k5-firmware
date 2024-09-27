@@ -15,6 +15,7 @@
  */
 
 #include "ui/main.h"
+#include "driver/keyboard.h"
 #include "driver/systick.h"
 #include "ui/fb.h"
 #include "ui/text.h"
@@ -34,4 +35,15 @@ void UI_DisplayMain(void) {
 	Systick_DelayMs(2000);
 	Text_DrawText(0, 4, "012345678901234567890"); // 3 pixels of empty space to the right i think
 	Framebuffer_UpdateScreen();
+
+	KEY_Code_t keycode;
+	while (1) {
+		//Framebuffer_Clear();
+		keycode = Keyboard_Poll();
+		Text_DrawChar(0, 5, Keyboard_ToChar(keycode));
+		Text_DrawChar(6, 5, Keyboard_CheckPTT() ? '1' : '0');
+		FB_MARKDIRTY(5);
+		Framebuffer_UpdateScreen();
+		Systick_DelayMs(100);
+	}
 }

@@ -1,5 +1,6 @@
 #include "ui/fb.h"
 #include <stdint.h>
+#include <string.h>
 #include "driver/st7565.h"
 
 uint8_t gFramebuffer[8][128];
@@ -16,4 +17,9 @@ void Framebuffer_UpdateScreen() {
         i++;
         gFramebufferAreas >>= 1;
     }
+}
+
+void Framebuffer_Clear() {
+    memset(gFramebuffer, 0, sizeof(gFramebuffer));
+    gFramebufferAreas = 0xFF;
 }

@@ -16,4 +16,7 @@ extern uint8_t gFramebufferAreas;
 // write rows that need updating to the screen
 void Framebuffer_UpdateScreen();
 
+// clear the entire framebuffer
+void Framebuffer_Clear();
+
 #endif

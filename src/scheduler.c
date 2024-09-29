@@ -14,9 +14,8 @@
  *     limitations under the License.
  */
 
-#include "misc.h"
-#include "driver/gpio.h"
-#include "bsp/dp32g030/gpio.h"
+#include "app/main.h"
+#include "driver/keyboard.h"
 
 #define DECREMENT_AND_TRIGGER(cnt, flag) \
 	do { \
@@ -27,13 +26,15 @@
 		} \
 	} while(0)
 
-static volatile uint32_t gGlobalSysTickCounter;
+static volatile uint32_t gSystickCount;
 
-void Sched_SystickHandler() {
-	gGlobalSysTickCounter++;
-	if ((gGlobalSysTickCounter % 50) == 0) {
-		gNextTimeslice500ms = true;
+void Sched_SystickHandler() { // every 10ms
+	gSystickCount++;
+	if ((gSystickCount % 50) == 0) { // every 500ms
+		gAppShouldUpdate = 1;
 	}
-	// blink backlight
-	GPIO_FlipBit(&GPIOB->DATA, GPIOB_PIN_BACKLIGHT);
+	
+	if (Keyboard_Poll() || Keyboard_CheckPTT()) { // if there's been a change in the pressed keys
+		gAppShouldUpdate = 1;
+	}
 }

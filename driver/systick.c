@@ -16,7 +16,6 @@
 
 #include "ARMCM0.h"
 #include "driver/systick.h"
-#include "misc.h"
 
 // 0x20000324
 static uint32_t gTickMultiplier;

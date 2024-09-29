@@ -18,7 +18,7 @@
 //#include "bsp/dp32g030/gpio.h"
 #include "bsp/dp32g030/syscon.h"
 #include "board.h"
-//#include "driver/backlight.h"
+#include "driver/backlight.h"
 //#include "driver/bk4819.h"
 //#include "driver/gpio.h"
 //#include "driver/system.h"
@@ -66,7 +66,7 @@ int main() {
 	BATTERY_GetReadings(false);*/
 
 	
-	//BACKLIGHT_TurnOn();
+	BACKLIGHT_TurnOn();
 	App_Main();
 	
 	while (1) {}

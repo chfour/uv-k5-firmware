@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-enum KEY_Code_t {
+typedef enum Keycode_t {
 	KEY_0 = 0,
 	KEY_1 = 1,
 	KEY_2 = 2,
@@ -41,23 +41,25 @@ enum KEY_Code_t {
 	// KEY_PTT = 21,
 	KEY_SIDE2 = 22,
 	KEY_SIDE1 = 23,
-	KEY_INVALID = 255,
-};
+	KEY_NONE = 255,
+} Keycode_t;
 
-typedef enum KEY_Code_t KEY_Code_t;
+// currently pressed key, or KEY_NONE
+extern Keycode_t gKeyboardCurrentKey;
 
-extern KEY_Code_t gKeyReading0;
-extern KEY_Code_t gKeyReading1;
-extern uint16_t gDebounceCounter;
-extern bool gWasFKeyPressed;
+// currently pressed key, but only set on key press and not constantly (so we can reset it)
+extern Keycode_t gKeyboardKeypress;
 
-// check if the ptt button is pressed
+// current state of the ptt button
+extern uint8_t gKeyboardPttState;
+
+// check if the state of the ptt button has changed since the last call
 uint8_t Keyboard_CheckPTT();
 
-// poll the keypad
-KEY_Code_t Keyboard_Poll();
+// poll the keypad, returns 1 if the pressed key changed since the last call
+uint8_t Keyboard_Poll();
 
 // convert a keycode to a char
-char Keyboard_ToChar(KEY_Code_t keycode);
+char Keyboard_ToChar(Keycode_t keycode);
 
 #endif

@@ -20,32 +20,35 @@
 #include "driver/keyboard.h"
 #include "driver/systick.h"
 
-KEY_Code_t gKeyReading0 = KEY_INVALID;
-KEY_Code_t gKeyReading1 = KEY_INVALID;
-uint16_t gDebounceCounter;
-bool gWasFKeyPressed;
+Keycode_t gKeyboardCurrentKey = KEY_NONE;
+Keycode_t gKeyboardKeypress = KEY_NONE;
+
+uint8_t gKeyboardPttState = 0;
 
 uint8_t Keyboard_CheckPTT() {
-	return !GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT);
+	uint8_t last = gKeyboardPttState;
+	gKeyboardPttState = !GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT);
+
+	return last != gKeyboardPttState;
 }
 
-KEY_Code_t Keyboard_Poll() {
-	KEY_Code_t Key = KEY_INVALID;
+uint8_t Keyboard_Poll() {
+	Keycode_t prev_key = gKeyboardCurrentKey;
+	gKeyboardCurrentKey = KEY_NONE;
 
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_5);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
-
 	Systick_DelayUs(1);
 
 	// Keys connected to gnd
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
-		Key = KEY_SIDE1;
+		gKeyboardCurrentKey = KEY_SIDE1;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_1)) {
-		Key = KEY_SIDE2;
+		gKeyboardCurrentKey = KEY_SIDE2;
 		goto Bye;
 	}
 	// Original doesn't do PTT
@@ -55,110 +58,104 @@ KEY_Code_t Keyboard_Poll() {
 	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
-		Key = KEY_MENU;
+		gKeyboardCurrentKey = KEY_MENU;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_1)) {
-		Key = KEY_1;
+		gKeyboardCurrentKey = KEY_1;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_2)) {
-		Key = KEY_4;
+		gKeyboardCurrentKey = KEY_4;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_3)) {
-		Key = KEY_7;
+		gKeyboardCurrentKey = KEY_7;
 		goto Bye;
 	}
 
 	// Second row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_5);
-	Systick_DelayUs(1);
-
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
 	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
-		Key = KEY_UP;
+		gKeyboardCurrentKey = KEY_UP;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_1)) {
-		Key = KEY_2;
+		gKeyboardCurrentKey = KEY_2;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_2)) {
-		Key = KEY_5;
+		gKeyboardCurrentKey = KEY_5;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_3)) {
-		Key = KEY_8;
+		gKeyboardCurrentKey = KEY_8;
 		goto Bye;
 	}
 
 	// Third row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
-	Systick_DelayUs(1);
-
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_5);
-	Systick_DelayUs(1);
-
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
-	Systick_DelayUs(1);
-
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
 	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
-		Key = KEY_DOWN;
+		gKeyboardCurrentKey = KEY_DOWN;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_1)) {
-		Key = KEY_3;
+		gKeyboardCurrentKey = KEY_3;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_2)) {
-		Key = KEY_6;
+		gKeyboardCurrentKey = KEY_6;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_3)) {
-		Key = KEY_9;
+		gKeyboardCurrentKey = KEY_9;
 		goto Bye;
 	}
 
 	// Fourth row
 	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
-	Systick_DelayUs(1);
-
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
 	Systick_DelayUs(1);
 
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_0)) {
-		Key = KEY_EXIT;
+		gKeyboardCurrentKey = KEY_EXIT;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_1)) {
-		Key = KEY_STAR;
+		gKeyboardCurrentKey = KEY_STAR;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_2)) {
-		Key = KEY_0;
+		gKeyboardCurrentKey = KEY_0;
 		goto Bye;
 	}
 	if (!GPIO_CheckBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_3)) {
-		Key = KEY_F;
+		gKeyboardCurrentKey = KEY_F;
 		goto Bye;
 	}
 
 Bye:
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_4);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_5);
-	GPIO_ClearBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
+	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
 
-	return Key;
+	if (prev_key != gKeyboardCurrentKey && gKeyboardCurrentKey != KEY_NONE) {
+		gKeyboardKeypress = gKeyboardCurrentKey;
+	}
+
+	return prev_key != gKeyboardCurrentKey;
 }
 
-char Keyboard_ToChar(KEY_Code_t keycode) {
+char Keyboard_ToChar(Keycode_t keycode) {
 	switch (keycode) {
 		case KEY_0: case KEY_1:
 		case KEY_2: case KEY_3:

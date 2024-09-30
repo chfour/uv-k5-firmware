@@ -17,15 +17,6 @@
 #include "app/main.h"
 #include "driver/keyboard.h"
 
-#define DECREMENT_AND_TRIGGER(cnt, flag) \
-	do { \
-		if (cnt) { \
-			if (--cnt == 0) { \
-				flag = true; \
-			} \
-		} \
-	} while(0)
-
 static volatile uint32_t gSystickCount;
 
 void Sched_SystickHandler() { // every 10ms
@@ -33,8 +24,10 @@ void Sched_SystickHandler() { // every 10ms
 	if ((gSystickCount % 50) == 0) { // every 500ms
 		gAppShouldUpdate = 1;
 	}
-	
-	if (Keyboard_Poll() || Keyboard_CheckPTT()) { // if there's been a change in the pressed keys
+
+	uint8_t keys_changed = Keyboard_Poll();
+	// if the pressed keys have changed, there's an unhandled key event or the ptt state changed
+	if (keys_changed || gKeyboardKeypress != KEY_NONE || Keyboard_CheckPTT()) {
 		gAppShouldUpdate = 1;
 	}
 }

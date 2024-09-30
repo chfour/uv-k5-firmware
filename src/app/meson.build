@@ -1,3 +1,7 @@
 sources += files(
-    'main.c'
+    'main.c',
+    'listmenu.c',
+    
+    'test.c',
+    'vfo.c'
 )

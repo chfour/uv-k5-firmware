@@ -16,6 +16,7 @@
 
 #include "app/main.h"
 #include "driver/keyboard.h"
+#include <stdint.h>
 
 static volatile uint32_t gSystickCount;
 
@@ -29,5 +30,13 @@ void Sched_SystickHandler() { // every 10ms
 	// if the pressed keys have changed, there's an unhandled key event or the ptt state changed
 	if (keys_changed || gKeyboardKeypress != KEY_NONE || Keyboard_CheckPTT()) {
 		gAppShouldUpdate = 1;
+	}
+
+	if ((gSystickCount % 10) == 0) { // every 100ms
+		// fire key autorepeat events
+		if (gKeyboardIsAutorepeating) {
+			gKeyboardKeypress = gKeyboardCurrentKey;
+			gAppShouldUpdate = 1;
+		}
 	}
 }

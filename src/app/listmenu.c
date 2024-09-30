@@ -14,12 +14,21 @@ uint8_t App_Listmenu_Main(char** items, uint8_t count, uint8_t* cursor) {
     while (1) {
         switch (gKeyboardKeypress) {
             case KEY_UP:
-                if (*cursor == 0) *cursor = count - 1;
-                else (*cursor)--;
+                if (*cursor == 0) {
+                    // do not wrap around if autorepeating
+                    if (!gKeyboardIsAutorepeating)
+                        *cursor = count - 1;
+                } else {
+                    (*cursor)--;
+                }
                 break;
             case KEY_DOWN:
-                if (*cursor >= count - 1) *cursor = 0;
-                else (*cursor)++;
+                if (*cursor >= count - 1) {
+                    if (!gKeyboardIsAutorepeating)
+                        *cursor = 0;
+                } else {
+                    (*cursor)++;
+                }
                 break;
             case KEY_EXIT:
                 gKeyboardKeypress = KEY_NONE;
@@ -51,7 +60,7 @@ uint8_t App_Listmenu_Main(char** items, uint8_t count, uint8_t* cursor) {
                 //scroll_offset--;
             }
         }
-        snprintf(buf, sizeof(buf), "% 2d/% 2d", (*cursor) + 1, count);
+        snprintf(buf, sizeof(buf), "%2d/%2d", (*cursor) + 1, count);
         Text_DrawText(0, 0, buf);
         // draw list
         uint8_t real_i;
@@ -62,9 +71,9 @@ uint8_t App_Listmenu_Main(char** items, uint8_t count, uint8_t* cursor) {
         }
         // show there's more above/below
         if (scroll_offset > 0)
-            Text_DrawChar(127-5, 0, FONT_SYM_ARROWU);
+            Text_DrawChar(0, 0, FONT_SYM_ARROWU);
         if (count > 7 && scroll_offset < count - per_screen) {
-            Text_DrawChar(127-5, 7, FONT_SYM_ARROWD);
+            Text_DrawChar(0, 7, FONT_SYM_ARROWD);
             FB_MARKDIRTY(7);
         }
         Framebuffer_UpdateScreen();

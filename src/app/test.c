@@ -8,8 +8,8 @@
 
 void App_Test_Main() {
     Framebuffer_Clear();
-    Text_DrawText(0, 4, "012345678901234567890"); // 3 pixels of empty space to the right i think
-    Framebuffer_UpdateScreen();
+    //Text_DrawText(0, 4, "012345678901234567890"); // 3 pixels of empty space to the right i think
+    //Framebuffer_UpdateScreen();
 
     uint8_t state1 = 0;
     uint8_t state2 = 0;
@@ -41,8 +41,10 @@ void App_Test_Main() {
 
         state2 ^= 1;
 
-        snprintf(buf, sizeof(buf), "menu: c:%d ->%d", menu_cursor, menu_return);
+        snprintf(buf, sizeof(buf), "menu: c:%2d ->%2d", menu_cursor, menu_return);
         Text_DrawText(0, 3, buf);
+        snprintf(buf, sizeof(buf), "pressedfor: %3d", gKeyboardPressedFor);
+        Text_DrawText(0, 4, buf);
 
         x = 0;
         x += Text_DrawChar(x, 5, Keyboard_ToChar(gKeyboardCurrentKey));

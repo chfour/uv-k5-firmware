@@ -20,8 +20,10 @@
 #include "driver/keyboard.h"
 #include "driver/systick.h"
 
-Keycode_t gKeyboardCurrentKey = KEY_NONE;
-Keycode_t gKeyboardKeypress = KEY_NONE;
+volatile Keycode_t gKeyboardCurrentKey = KEY_NONE;
+volatile Keycode_t gKeyboardKeypress = KEY_NONE;
+volatile uint8_t gKeyboardPressedFor = 0;
+volatile uint8_t gKeyboardIsAutorepeating = 0;
 
 uint8_t gKeyboardPttState = 0;
 
@@ -148,9 +150,18 @@ Bye:
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_6);
 	GPIO_SetBit(&GPIOA->DATA, GPIOA_PIN_KEYBOARD_7);
 
-	if (prev_key != gKeyboardCurrentKey && gKeyboardCurrentKey != KEY_NONE) {
-		gKeyboardKeypress = gKeyboardCurrentKey;
+	if (prev_key != gKeyboardCurrentKey) { // keys changed
+		gKeyboardPressedFor = 0; // reset both at press and release
+
+		if (gKeyboardCurrentKey != KEY_NONE) { // a key was just pressed
+			gKeyboardKeypress = gKeyboardCurrentKey;
+		}
 	}
+	if (gKeyboardCurrentKey != KEY_NONE && gKeyboardPressedFor < UINT8_MAX) {
+		gKeyboardPressedFor++;
+	}
+	
+	gKeyboardIsAutorepeating = gKeyboardPressedFor >= 50;
 
 	return prev_key != gKeyboardCurrentKey;
 }

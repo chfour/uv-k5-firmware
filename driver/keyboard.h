@@ -45,10 +45,16 @@ typedef enum Keycode_t {
 } Keycode_t;
 
 // currently pressed key, or KEY_NONE
-extern Keycode_t gKeyboardCurrentKey;
+extern volatile Keycode_t gKeyboardCurrentKey;
 
 // currently pressed key, but only set on key press and not constantly (so we can reset it)
-extern Keycode_t gKeyboardKeypress;
+extern volatile Keycode_t gKeyboardKeypress;
+
+// how long has the key been pressed for, in systicks
+extern volatile uint8_t gKeyboardPressedFor;
+
+// whether key autorepeat is happening
+extern volatile uint8_t gKeyboardIsAutorepeating;
 
 // current state of the ptt button
 extern uint8_t gKeyboardPttState;

@@ -25,7 +25,7 @@ static const uint16_t FSK_RogerTable[7] = {
 	0x4E8A, 0xE044, 0xEA84,
 };
 
-static uint16_t gBK4819_GpioOutState;
+static uint8_t gBK4819_GpioState = 0;
 
 bool gRxIdleMode;
 
@@ -60,7 +60,6 @@ void BK4819_Init() {
 	BK4819_WriteRegister(BK4819_REG_09, 0xF09F);
 	BK4819_WriteRegister(BK4819_REG_1F, 0x5454);
 	BK4819_WriteRegister(BK4819_REG_3E, 0xA037);
-	gBK4819_GpioOutState = 0x9000;
 	BK4819_WriteRegister(BK4819_REG_33, 0x9000);
 	BK4819_WriteRegister(BK4819_REG_3F, 0);
 }
@@ -189,14 +188,14 @@ void BK4819_SetAGC(uint8_t Value) {
 	}
 }
 
-void BK4819_ToggleGpioOut(BK4819_GPIO_PIN_t Pin, bool bSet) {
-	if (bSet) {
-		gBK4819_GpioOutState |= (0x40U >> Pin);
+void BK4819_GpioSet(BK4819_GPIO_PIN_t pin, uint8_t v) {
+	if (v) {
+		gBK4819_GpioState |= (0x40U >> pin);
 	} else {
-		gBK4819_GpioOutState &= ~(0x40U >> Pin);
+		gBK4819_GpioState &= ~(0x40U >> pin);
 	}
-
-	BK4819_WriteRegister(BK4819_REG_33, gBK4819_GpioOutState);
+	// idk why 0x9000 it says that's for "gpio output disable"
+	BK4819_WriteRegister(BK4819_REG_33, 0x9000 | gBK4819_GpioState);
 }
 
 void BK4819_SetCDCSSCodeWord(uint32_t CodeWord) {
@@ -357,14 +356,14 @@ void BK4819_RX_TurnOn() {
 
 void BK4819_SelectFilter(uint32_t Frequency) {
 	if (Frequency < 28000000) {
-		BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, true);
-		BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, false);
+		BK4819_GpioSet(BK4819_GPIO4_PIN32_VHF_LNA, true);
+		BK4819_GpioSet(BK4819_GPIO3_PIN31_UHF_LNA, false);
 	} else if (Frequency == 0xFFFFFFFF) {
-		BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, false);
-		BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, false);
+		BK4819_GpioSet(BK4819_GPIO4_PIN32_VHF_LNA, false);
+		BK4819_GpioSet(BK4819_GPIO3_PIN31_UHF_LNA, false);
 	} else {
-		BK4819_ToggleGpioOut(BK4819_GPIO4_PIN32_VHF_LNA, false);
-		BK4819_ToggleGpioOut(BK4819_GPIO3_PIN31_UHF_LNA, true);
+		BK4819_GpioSet(BK4819_GPIO4_PIN32_VHF_LNA, false);
+		BK4819_GpioSet(BK4819_GPIO3_PIN31_UHF_LNA, true);
 	}
 }
 
@@ -507,7 +506,7 @@ void BK4819_ExitSubAu() {
 
 void BK4819_EnableRX() {
 	if (gRxIdleMode) {
-		BK4819_ToggleGpioOut(BK4819_GPIO0_PIN28_RX_ENABLE, true);
+		BK4819_GpioSet(BK4819_GPIO0_PIN28_RX_ENABLE, true);
 		BK4819_RX_TurnOn();
 	}
 }

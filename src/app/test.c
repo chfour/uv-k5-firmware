@@ -1,5 +1,7 @@
 #include "app/test.h"
 #include "app/main.h"
+#include "driver/bk4819-regs.h"
+#include "driver/bk4819.h"
 #include "driver/keyboard.h"
 #include "ui/text.h"
 #include "ui/fb.h"
@@ -40,6 +42,7 @@ void App_Test_Main() {
         gKeyboardKeypress = KEY_NONE;
 
         state2 ^= 1;
+        BK4819_GpioSet(BK4819_GPIO6_PIN2_GREEN, state2);
 
         snprintf(buf, sizeof(buf), "menu: c:%2d ->%2d", menu_cursor, menu_return);
         Text_DrawText(0, 3, buf);
@@ -60,4 +63,6 @@ void App_Test_Main() {
         Framebuffer_UpdateScreen();
         App_Wait();
     }
+
+    BK4819_GpioSet(BK4819_GPIO6_PIN2_GREEN, 0);
 }

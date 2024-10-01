@@ -474,6 +474,7 @@ void Board_Init() {
 	Board_GPIO_Init();
 	Board_ADC_Init();
 	ST7565_Init();
+	BK4819_Init();
 #if defined(ENABLE_FMRADIO)
 	BK1080_Init(0, false);
 #endif

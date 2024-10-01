@@ -58,7 +58,8 @@ void BK4819_WriteU16(uint16_t Data);
 
 void BK4819_SetAGC(uint8_t Value);
 
-void BK4819_ToggleGpioOut(BK4819_GPIO_PIN_t Pin, bool bSet);
+// set the state of a gpio pin
+void BK4819_GpioSet(BK4819_GPIO_PIN_t pin, uint8_t v);
 
 void BK4819_SetCDCSSCodeWord(uint32_t CodeWord);
 void BK4819_SetCTCSSFrequency(uint32_t BaudRate);

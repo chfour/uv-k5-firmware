@@ -71,9 +71,9 @@ uint8_t App_Listmenu_Main(char** items, uint8_t count, uint8_t* cursor) {
         }
         // show there's more above/below
         if (scroll_offset > 0)
-            Text_DrawChar(0, 0, FONT_SYM_ARROWU);
+            Text_DrawChar(127-5, 0, FONT_SYM_ARROWU);
         if (count > 7 && scroll_offset < count - per_screen) {
-            Text_DrawChar(0, 7, FONT_SYM_ARROWD);
+            Text_DrawChar(127-5, 7, FONT_SYM_ARROWD);
             FB_MARKDIRTY(7);
         }
         Framebuffer_UpdateScreen();

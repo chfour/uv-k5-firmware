@@ -13,16 +13,10 @@
 void App_Vfo_Main() {
     uint32_t frequency = 14550000; // in 10Hz
     char buf[32];
-    BK4819_SetFrequency(frequency);
-    BK4819_SelectFilter(frequency);
-    SquelchInfo_t sqlinfo;
-    Radio_GetSquelchData(frequency, 1, &sqlinfo);
-    BK4819_SetupSquelch(&sqlinfo);
-    BK4819_SetFilterBandwidth(BK4819_FILTER_BW_NARROW);
-    BK4819_SetAGC(1);
-    BK4819_RX_TurnOn();
-    BK4819_SetAF(BK4819_AF_OPEN);
     uint8_t state = 0;
+    uint16_t step = 625;
+    uint8_t vfo_changed = 1;
+    SquelchInfo_t sqlinfo;
     while (1) {
         Framebuffer_Clear();
         uint16_t interrupts;
@@ -43,14 +37,56 @@ void App_Vfo_Main() {
             break;
         }
         if (gKeyboardKeypress == KEY_STAR) {
-            // enables audio amp
-            GPIO_SetBit(&GPIOC->DATA, GPIOC_PIN_AUDIO_PATH);
+            if (GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_AUDIO_PATH)) {
+                GPIO_ClearBit(&GPIOC->DATA, GPIOC_PIN_AUDIO_PATH);
+            } else {
+                GPIO_SetBit(&GPIOC->DATA, GPIOC_PIN_AUDIO_PATH);
+            }
         }
-        if (gKeyboardKeypress == KEY_0) {
-            GPIO_ClearBit(&GPIOC->DATA, GPIOC_PIN_AUDIO_PATH);
+        if (gKeyboardKeypress == KEY_F) {
+            /*
+            250,
+            500,
+            625,
+            1000,
+            1250,
+            2500,
+            */
+            switch (step) {
+                case 250:
+                    step = 500; break;
+                case 500:
+                    step = 625; break;
+                case 625:
+                    step = 1000; break;
+                case 1000:
+                    step = 1250; break;
+                case 2500:
+                default:
+                    step = 250; break;
+            }
+        }
+        if (gKeyboardKeypress == KEY_UP) {
+            frequency += step;
+            vfo_changed = 1;
+        }
+        if (gKeyboardKeypress == KEY_DOWN) {
+            frequency -= step;
+            vfo_changed = 1;
+        }
+        if (vfo_changed) {
+            BK4819_SetFrequency(frequency);
+            BK4819_SelectFilter(frequency);
+            Radio_GetSquelchData(frequency, 1, &sqlinfo);
+            BK4819_SetupSquelch(&sqlinfo);
+            BK4819_SetFilterBandwidth(BK4819_FILTER_BW_NARROW);
+            BK4819_SetAGC(1);
+            BK4819_RX_TurnOn();
+            BK4819_SetAF(BK4819_AF_OPEN);
+            vfo_changed = 0;
         }
         gKeyboardKeypress = KEY_NONE;
-        snprintf(buf, sizeof(buf), "%9ld", frequency);
+        snprintf(buf, sizeof(buf), "%9ld / %4d", frequency, step);
         Text_DrawText(0, 2, buf);
         snprintf(buf, sizeof(buf), "%02x %02x", sqlinfo.SquelchOpenRSSI, sqlinfo.SquelchCloseRSSI);
         Text_DrawText(0, 3, buf);

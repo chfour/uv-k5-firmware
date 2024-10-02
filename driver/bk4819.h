@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "driver/bk4819-regs.h"
+#include "radio.h"
 
 enum BK4819_AF_Type_t {
 	BK4819_AF_MUTE = 0U,
@@ -48,13 +49,17 @@ enum BK4819_CssScanResult_t {
 
 typedef enum BK4819_CssScanResult_t BK4819_CssScanResult_t;
 
-extern bool gRxIdleMode;
-
 void BK4819_Init();
 uint16_t BK4819_ReadRegister(BK4819_REGISTER_t Register);
 void BK4819_WriteRegister(BK4819_REGISTER_t Register, uint16_t Data);
 void BK4819_WriteU8(uint8_t Data);
 void BK4819_WriteU16(uint16_t Data);
+
+// check the interrupt pin
+uint8_t BK4819_CheckForInterrupts();
+
+// get interrupt flags
+uint16_t BK4819_GetInterrupts();
 
 void BK4819_SetAGC(uint8_t Value);
 
@@ -68,10 +73,9 @@ void BK4819_EnableVox(uint16_t Vox1Threshold, uint16_t Vox0Threshold);
 void BK4819_SetFilterBandwidth(BK4819_FilterBandwidth_t Bandwidth);
 void BK4819_SetupPowerAmplifier(uint16_t Bias, uint32_t Frequency);
 void BK4819_SetFrequency(uint32_t Frequency);
-void BK4819_SetupSquelch(
-		uint8_t SquelchOpenRSSIThresh, uint8_t SquelchCloseRSSIThresh,
-		uint8_t SquelchOpenNoiseThresh, uint8_t SquelchCloseNoiseThresh,
-		uint8_t SquelchCloseGlitchThresh, uint8_t SquelchOpenGlitchThresh);
+
+// set squelch parameters. see radio.c Radio_GetSquelchData()
+void BK4819_SetupSquelch(SquelchInfo_t* sqlinfo);
 
 void BK4819_SetAF(BK4819_AF_Type_t AF);
 void BK4819_RX_TurnOn();
@@ -93,8 +97,6 @@ void BK4819_ExitBypass();
 void BK4819_PrepareTransmit();
 void BK4819_TxOn_Beep();
 void BK4819_ExitSubAu();
-
-void BK4819_EnableRX();
 
 void BK4819_EnterDTMF_TX(bool bLocalLoopback);
 void BK4819_ExitDTMF_TX(bool bKeep);

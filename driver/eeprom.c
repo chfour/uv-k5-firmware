@@ -18,8 +18,7 @@
 #include "driver/i2c.h"
 #include "driver/systick.h"
 
-void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size)
-{
+void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size) {
 	I2C_Start();
 
 	I2C_Write(0xA0);
@@ -36,9 +35,7 @@ void EEPROM_ReadBuffer(uint16_t Address, void *pBuffer, uint8_t Size)
 	I2C_Stop();
 }
 
-void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer)
-
-{
+void EEPROM_WriteBuffer(uint16_t Address, const void *pBuffer) {
 	I2C_Start();
 
 	I2C_Write(0xA0);

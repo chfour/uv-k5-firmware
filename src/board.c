@@ -71,6 +71,10 @@ void Board_GPIO_Init() {
 		// BK1080
 		| GPIO_DIR_15_BITS_OUTPUT
 		;
+	GPIOB->DIR &= ~(0
+		// swd clk / bk4819 int
+		| GPIO_DIR_14_MASK // input
+		);
 	GPIOC->DIR |= 0
 		// BK4819 SCN
 		| GPIO_DIR_0_BITS_OUTPUT
@@ -166,7 +170,7 @@ void Board_PORTCON_Init() {
 		| PORTCON_PORTB_SEL1_B9_MASK
 		// ST7565 + SWD IO
 		| PORTCON_PORTB_SEL1_B11_MASK
-		// SWD CLK
+		// BK4819 int + SWD CLK
 		| PORTCON_PORTB_SEL1_B14_MASK
 		// BK1080
 		| PORTCON_PORTB_SEL1_B15_MASK
@@ -186,6 +190,8 @@ void Board_PORTCON_Init() {
 #else
 		// ST7565
 		| PORTCON_PORTB_SEL1_B11_BITS_GPIOB11
+		// BK4819 int
+		| PORTCON_PORTB_SEL1_B14_BITS_GPIOB14
 #endif
 		;
 

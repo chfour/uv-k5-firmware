@@ -4,7 +4,8 @@ sources += files(
     'init.c',
     'main.c',
     'misc.c',
-    'scheduler.c'
+    'scheduler.c',
+    'radio.c'
 )
 
 includes += include_directories('.')

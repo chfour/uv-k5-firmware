@@ -43,7 +43,8 @@ enum GPIOB_PINS {
 	GPIOB_PIN_ST7565_RES = 11, // Shared with SWD!
 
 	GPIOB_PIN_SWD_IO = 11, // Shared with ST7565!
-	GPIOB_PIN_SWD_CLK = 14,
+	GPIOB_PIN_SWD_CLK = 14, // also goes to BK4819 GPIO2
+	GPIOB_PIN_BK4819_INT = 14,
 
 	GPIOB_PIN_BK1080 = 15,
 };

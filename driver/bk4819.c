@@ -17,8 +17,10 @@
 #include "driver/bk4819.h"
 #include "bsp/dp32g030/gpio.h"
 #include "bsp/dp32g030/portcon.h"
+#include "driver/bk4819-regs.h"
 #include "driver/gpio.h"
 #include "driver/systick.h"
+#include "radio.h"
 
 static const uint16_t FSK_RogerTable[7] = {
 	0xF1A2, 0x7446, 0x61A4, 0x6544,
@@ -26,8 +28,6 @@ static const uint16_t FSK_RogerTable[7] = {
 };
 
 static uint8_t gBK4819_GpioState = 0;
-
-bool gRxIdleMode;
 
 void BK4819_Init() {
 	GPIO_SetBit(&GPIOC->DATA, GPIOC_PIN_BK4819_SCN);
@@ -60,8 +60,10 @@ void BK4819_Init() {
 	BK4819_WriteRegister(BK4819_REG_09, 0xF09F);
 	BK4819_WriteRegister(BK4819_REG_1F, 0x5454);
 	BK4819_WriteRegister(BK4819_REG_3E, 0xA037);
-	BK4819_WriteRegister(BK4819_REG_33, 0x9000);
-	BK4819_WriteRegister(BK4819_REG_3F, 0);
+	BK4819_WriteRegister(BK4819_REG_3F, 0xffff);
+	//BK4819_WriteRegister(BK4819_REG_33, 0x8000); // hours were spent here
+	BK4819_GpioSet(BK4819_GPIO6_PIN2_GREEN, 0);
+	BK4819_WriteRegister(BK4819_REG_35, 1); // set gpio2 role to 1 (interrupt)
 }
 
 static uint16_t BK4819_ReadU16() {
@@ -160,6 +162,20 @@ void BK4819_WriteU16(uint16_t Data) {
 	}
 }
 
+uint8_t BK4819_CheckForInterrupts() {
+	return GPIO_CheckBit(&GPIOB->DATA, GPIOB_PIN_BK4819_INT);
+}
+
+uint16_t BK4819_GetInterrupts() {
+	uint8_t have_interrupts = BK4819_ReadRegister(BK4819_REG_0C) & 1;
+	if (have_interrupts) {
+		uint16_t ints = BK4819_ReadRegister(BK4819_REG_02);
+		BK4819_WriteRegister(BK4819_REG_02, 0);
+		return ints;
+	}
+	return 0;
+}
+
 void BK4819_SetAGC(uint8_t Value) {
 	if (Value == 0) {
 		BK4819_WriteRegister(BK4819_REG_13, 0x03BE);
@@ -195,7 +211,8 @@ void BK4819_GpioSet(BK4819_GPIO_PIN_t pin, uint8_t v) {
 		gBK4819_GpioState &= ~(0x40U >> pin);
 	}
 	// idk why 0x9000 it says that's for "gpio output disable"
-	BK4819_WriteRegister(BK4819_REG_33, 0x9000 | gBK4819_GpioState);
+	// yup had to change it to 0x8000. GPIO2 had output disable set
+	BK4819_WriteRegister(BK4819_REG_33, 0x8000 | gBK4819_GpioState);
 }
 
 void BK4819_SetCDCSSCodeWord(uint32_t CodeWord) {
@@ -307,13 +324,13 @@ void BK4819_SetFrequency(uint32_t Frequency) {
 	BK4819_WriteRegister(BK4819_REG_39, (Frequency >> 16) & 0xFFFF);
 }
 
-void BK4819_SetupSquelch(uint8_t SquelchOpenRSSIThresh, uint8_t SquelchCloseRSSIThresh, uint8_t SquelchOpenNoiseThresh, uint8_t SquelchCloseNoiseThresh, uint8_t SquelchCloseGlitchThresh, uint8_t SquelchOpenGlitchThresh) {
+void BK4819_SetupSquelch(SquelchInfo_t* sqlinfo) {
 	BK4819_WriteRegister(BK4819_REG_70, 0);
-	BK4819_WriteRegister(BK4819_REG_4D, 0xA000 | SquelchCloseGlitchThresh);
+	BK4819_WriteRegister(BK4819_REG_4D, 0xA000 | sqlinfo->SquelchCloseGlitch);
 	// 0x6f = 0110 1111 meaning the default sql delays from the datasheet are used (101 and 111)
-	BK4819_WriteRegister(BK4819_REG_4E, 0x6F00 | SquelchOpenGlitchThresh);
-	BK4819_WriteRegister(BK4819_REG_4F, (SquelchCloseNoiseThresh << 8) | SquelchOpenNoiseThresh);
-	BK4819_WriteRegister(BK4819_REG_78, (SquelchOpenRSSIThresh << 8) | SquelchCloseRSSIThresh);
+	BK4819_WriteRegister(BK4819_REG_4E, 0x6F00 | sqlinfo->SquelchOpenGlitch);
+	BK4819_WriteRegister(BK4819_REG_4F, (sqlinfo->SquelchCloseNoise << 8) | sqlinfo->SquelchOpenNoise);
+	BK4819_WriteRegister(BK4819_REG_78, (sqlinfo->SquelchOpenRSSI << 8) | sqlinfo->SquelchCloseRSSI);
 	BK4819_SetAF(BK4819_AF_MUTE);
 	BK4819_RX_TurnOn();
 }
@@ -325,6 +342,8 @@ void BK4819_SetAF(BK4819_AF_Type_t AF) {
 }
 
 void BK4819_RX_TurnOn() {
+	BK4819_GpioSet(BK4819_GPIO0_PIN28_RX_ENABLE, true);
+
 	// DSP Voltage Setting = 1
 	// ANA LDO = 2.7v
 	// VCO LDO = 2.7v
@@ -502,13 +521,6 @@ void BK4819_TxOn_Beep() {
 
 void BK4819_ExitSubAu() {
 	BK4819_WriteRegister(BK4819_REG_51, 0x0000);
-}
-
-void BK4819_EnableRX() {
-	if (gRxIdleMode) {
-		BK4819_GpioSet(BK4819_GPIO0_PIN28_RX_ENABLE, true);
-		BK4819_RX_TurnOn();
-	}
 }
 
 void BK4819_EnterDTMF_TX(bool bLocalLoopback) {

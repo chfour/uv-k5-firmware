@@ -16,6 +16,7 @@
 
 #include "app/main.h"
 #include "driver/keyboard.h"
+#include "driver/bk4819.h"
 #include <stdint.h>
 
 static volatile uint32_t gSystickCount;
@@ -29,6 +30,11 @@ void Sched_SystickHandler() { // every 10ms
 	uint8_t keys_changed = Keyboard_Poll();
 	// if the pressed keys have changed, there's an unhandled key event or the ptt state changed
 	if (keys_changed || gKeyboardKeypress != KEY_NONE || Keyboard_CheckPTT()) {
+		gAppShouldUpdate = 1;
+	}
+
+	// we have an interrupt from the bk4819
+	if (BK4819_CheckForInterrupts()) {
 		gAppShouldUpdate = 1;
 	}
 

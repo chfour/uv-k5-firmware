@@ -9,6 +9,7 @@
 #include "radio.h"
 #include "ui/fb.h"
 #include "ui/text.h"
+#include <string.h>
 
 void App_Vfo_Main() {
     uint32_t frequency = 14550000; // in 10Hz
@@ -44,14 +45,7 @@ void App_Vfo_Main() {
             }
         }
         if (gKeyboardKeypress == KEY_F) {
-            /*
-            250,
-            500,
-            625,
-            1000,
-            1250,
-            2500,
-            */
+            // 250, 500, 625, 1000, 1250, 2500
             switch (step) {
                 case 250:
                     step = 500; break;
@@ -86,15 +80,24 @@ void App_Vfo_Main() {
             vfo_changed = 0;
         }
         gKeyboardKeypress = KEY_NONE;
-        snprintf(buf, sizeof(buf), "%9ld / %4d", frequency, step);
-        Text_DrawText(0, 2, buf);
+        snprintf(buf, sizeof(buf), "%9ld", frequency);
+        memmove(buf+5, buf+4, 6); // move everything but the first 4 chars ahead one byte
+        buf[4] = '.'; // add a dot between the two parts
+        uint8_t last_x = Text_DrawText(0, 2, buf);
+        
+        snprintf(buf, sizeof(buf), " st: %4d", step);
+        Text_DrawText(last_x, 2, buf);
+
         snprintf(buf, sizeof(buf), "%02x %02x", sqlinfo.SquelchOpenRSSI, sqlinfo.SquelchCloseRSSI);
         Text_DrawText(0, 3, buf);
+
         state ^= 1;
         snprintf(buf, sizeof(buf), "s:%c int:%c", state + '0', int_pin_state + '0');
         Text_DrawText(0, 4, buf);
+        
         snprintf(buf, sizeof(buf), "rssi: %d", BK4819_GetRSSI());
         Text_DrawText(0, 5, buf);
+        
         Framebuffer_UpdateScreen();
         App_Wait();
     }

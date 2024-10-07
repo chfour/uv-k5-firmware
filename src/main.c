@@ -66,7 +66,7 @@ int main() {
 	BATTERY_GetReadings(false);*/
 
 	
-	BACKLIGHT_TurnOn();
+	Backlight_On();
 	App_Main();
 	
 	while (1) {}

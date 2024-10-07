@@ -15,6 +15,7 @@
  */
 
 #include "app/main.h"
+#include "driver/backlight.h"
 #include "driver/keyboard.h"
 #include "driver/bk4819.h"
 #include <stdint.h>
@@ -31,6 +32,10 @@ void Sched_SystickHandler() { // every 10ms
 	// if the pressed keys have changed, there's an unhandled key event or the ptt state changed
 	if (keys_changed || gKeyboardKeypress != KEY_NONE || Keyboard_CheckPTT()) {
 		gAppShouldUpdate = 1;
+		Backlight_On();
+	}
+	if (gKeyboardCurrentKey != KEY_NONE) {
+		Backlight_On(); // also turn it on if a key is held at all
 	}
 
 	// we have an interrupt from the bk4819
@@ -44,5 +49,8 @@ void Sched_SystickHandler() { // every 10ms
 			gKeyboardKeypress = gKeyboardCurrentKey;
 			gAppShouldUpdate = 1;
 		}
+
+		// do the backlight task
+		Backlight_SchedTask();
 	}
 }

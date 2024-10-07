@@ -1,6 +1,7 @@
 #include "app/vfo.h"
 #include "app/main.h"
 #include "bsp/dp32g030/gpio.h"
+#include "driver/backlight.h"
 #include "driver/bk4819-regs.h"
 #include "driver/bk4819.h"
 #include "driver/gpio.h"
@@ -26,6 +27,7 @@ void App_Vfo_Main() {
             if (interrupts & BK4819_REG_02_SQUELCH_FOUND) { // im goingto kill somebody over those _SHIFT whatever names
                 BK4819_GpioSet(BK4819_GPIO6_PIN2_GREEN, 1);
                 GPIO_SetBit(&GPIOC->DATA, GPIOC_PIN_AUDIO_PATH);
+                Backlight_On();
             }
             if (interrupts & BK4819_REG_02_SQUELCH_LOST) {
                 BK4819_GpioSet(BK4819_GPIO6_PIN2_GREEN, 0);
